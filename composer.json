@@ -1,0 +1,20 @@
+{
+    "name": "swoopaholic/components",
+    "type": "library",
+    "description": "Collection of swoopaholic components",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Danny Dörfel",
+            "email": "danny.dorfel@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3"
+    },
+    "autoload": {
+        "psr-0": { "Swoopaholic\\Component\\": "" }
+    },
+    "target-dir": "Swoopaholic/Component",
+    "minimum-stability": "dev"
+}
