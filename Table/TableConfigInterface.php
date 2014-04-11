@@ -1,0 +1,31 @@
+<?php
+namespace Swoopaholic\Component\Table;
+
+/**
+ * Interface TableConfigInterface
+ * @package Swoopaholic\Component\Table
+ */
+interface TableConfigInterface
+{
+    public function getName();
+
+    public function getType();
+
+    public function setType(TableTypeInterface $type);
+
+    public function isDisabled();
+
+    public function setAttributes(array $attributes);
+
+    public function getAttributes();
+
+    public function hasAttribute($name);
+
+    public function getAttribute($name, $default = null);
+
+    public function getOptions();
+
+    public function hasOption($name);
+
+    public function getOption($name, $default = null);
+}
