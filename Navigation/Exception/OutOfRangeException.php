@@ -1,11 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: danny
- * Date: 14-12-13
- * Time: 16:58
+/*
+ * This file is part of the Swoopaholic Component package.
+ *
+ * (c) Danny Dörfel <danny@swoopaholic.nl>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
-
 namespace Swoopaholic\Bundle\FrameworkBundle\NavBar\Exception;
 
 

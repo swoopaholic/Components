@@ -1,11 +1,16 @@
 <?php
+/*
+ * This file is part of the Swoopaholic Component package.
+ *
+ * (c) Danny Dörfel <danny@swoopaholic.nl>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 namespace Swoopaholic\Component\Table;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-/**
- * @author Danny Dörfel <ddorfel@netvlies.nl>
- */
 interface TableTypeInterface
 {
     public function buildView(TableView $view, TableInterface $table, array $options);
