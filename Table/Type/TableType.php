@@ -67,6 +67,10 @@ class TableType extends BaseType
                 $classElements[] = 'table-' . $element;
             }
         }
+        
+        if (isset($options['attr']['class'])) {
+            $classElements[] = $options['attr']['class'];
+        }
 
         return implode(' ', $classElements);
     }
