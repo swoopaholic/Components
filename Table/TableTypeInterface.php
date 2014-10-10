@@ -13,6 +13,8 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 interface TableTypeInterface
 {
+    public function buildTable(TableBuilderInterface $builder, array $options);
+
     public function buildView(TableView $view, TableInterface $table, array $options);
 
     /**

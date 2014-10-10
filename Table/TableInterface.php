@@ -9,7 +9,7 @@
  */
 namespace Swoopaholic\Component\Table;
 
-interface TableInterface extends \ArrayAccess, \Iterator, \Countable
+interface TableInterface extends \ArrayAccess, \Traversable, \Countable
 {
     /**
      * @param TableInterface $parent
@@ -26,7 +26,7 @@ interface TableInterface extends \ArrayAccess, \Iterator, \Countable
      * @param $child
      * @return $this
      */
-    public function add($child);
+    public function add($child, $type = null, array $options = array());
 
     /**
      * Returns the child with the given name.

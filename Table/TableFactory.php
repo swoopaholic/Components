@@ -1,42 +1,78 @@
 <?php
-/*
- * This file is part of the Swoopaholic Component package.
- *
- * (c) Danny Dörfel <danny@swoopaholic.nl>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 namespace Swoopaholic\Component\Table;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use Swoopaholic\Component\Table\Exception\UnexpectedTypeException;
 
 class TableFactory implements TableFactoryInterface
 {
-//    /**
-//     * @var TableRegistryInterface
-//     */
-//    private $registry;
+    /**
+     * @var TableRegistryInterface
+     */
+    private $registry;
 
-    public function __construct(/*TableRegistryInterface $registry*/)
+    /**
+     * @var ResolvedTableTypeFactoryInterface
+     */
+    private $resolvedTypeFactory;
+
+    public function __construct(TableRegistryInterface $registry, ResolvedTableTypeFactoryInterface $resolvedTypeFactory)
     {
-        /*$this->registry = $registry;*/
+        $this->registry = $registry;
+        $this->resolvedTypeFactory = $resolvedTypeFactory;
     }
 
-    public function create($name, TableTypeInterface $type, array $options = array())
+    public function create($type = 'table', $data = null, array $options = array())
     {
-        $resolver = new OptionsResolver();
-        $type->setDefaultOptions($resolver);
-        $options = $resolver->resolve($options);
-
-        $config = new TableConfig($name, $options);
-        $config->setType($type);
-
-        return new Table($config);
+        return $this->createBuilder($type, $data, $options)->getTable();
     }
 
-    public function createNamed($name, array $options = array())
+    public function createNamed($name, $type = 'table', $data = null, array $options = array())
     {
-        // TODO implement from registry...
+        return $this->createNamedBuilder($name, $type, $data, $options)->getTable();
+    }
+
+    public function createBuilder($type = 'table', $data = null, array $options = array())
+    {
+//        $name = $type instanceof TableTypeInterface || $type instanceof ResolvedFormTypeInterface
+//            ? $type->getName()
+//            : $type;
+
+        $name = is_object($type) ? $type->getName() : $type;
+
+        return $this->createNamedBuilder($name, $type, $data, $options);
+    }
+
+    public function createNamedBuilder($name, $type = 'table', $data = null, array $options = array())
+    {
+        if (null !== $data && !array_key_exists('data', $options)) {
+            $options['data'] = $data;
+        }
+
+        if ($type instanceof TableTypeInterface) {
+            $type = $this->resolveType($type);
+        } elseif (is_string($type)) {
+            $type = $this->registry->getType($type);
+        } else {
+            throw new UnexpectedTypeException($type, 'string, or Swoopaholic\Component\Table\TableTypeInterface');
+        }
+
+        return $type->createBuilder($this, $name, $options);
+    }
+
+    private function resolveType(TableTypeInterface $type)
+    {
+        $parentType = $type->getParent();
+
+        if ($parentType instanceof TableTypeInterface) {
+            $parentType = $this->resolveType($parentType);
+        } elseif (null !== $parentType) {
+            $parentType = $this->registry->getType($parentType);
+        }
+
+        return $this->resolvedTypeFactory->createResolvedType(
+            $type,
+            array(),
+            $parentType
+        );
     }
 }

@@ -40,6 +40,10 @@ class TableConfig implements TableConfigInterface
      */
     private $options;
 
+    private $data;
+
+    private $viewTransformers = array();
+
     /**
      * @param $name
      * @param $options
@@ -62,7 +66,7 @@ class TableConfig implements TableConfigInterface
      * @param TableTypeInterface $type
      * @return $this
      */
-    public function setType(TableTypeInterface $type)
+    public function setType(ResolvedTableTypeInterface $type)
     {
         $this->type = $type;
         return $this;
@@ -75,6 +79,24 @@ class TableConfig implements TableConfigInterface
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * @param mixed $data
+     * @return $this
+     */
+    public function setData($data)
+    {
+        $this->data = $data;
+        return $this;
     }
 
     /**
@@ -145,5 +167,29 @@ class TableConfig implements TableConfigInterface
     public function getOption($name, $default = null)
     {
         return array_key_exists($name, $this->options) ? $this->options[$name] : $default;
+    }
+
+    public function addViewTransformer(DataTransformerInterface $transformer)
+    {
+        $this->viewTransformers[]  = $transformer;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getViewTransformers()
+    {
+        return $this->viewTransformers;
+    }
+
+    /**
+     * @param array $viewTransformers
+     * @return $this
+     */
+    public function setViewTransformers($viewTransformers)
+    {
+        $this->viewTransformers = $viewTransformers;
+        return $this;
     }
 }

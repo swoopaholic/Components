@@ -9,7 +9,14 @@
  */
 namespace Swoopaholic\Component\Table;
 
-class Table implements TableInterface
+use Swoopaholic\Component\Table\Exception\RuntimeException;
+use Swoopaholic\Component\Table\Exception\OutOfBoundsException;
+use Swoopaholic\Component\Table\Exception\UnexpectedTypeException;
+use Swoopaholic\Component\Table\Util\OrderedHashMap;
+use Symfony\Component\PropertyAccess\PropertyPath;
+use Traversable;
+
+class Table implements \IteratorAggregate, TableInterface
 {
     protected $parent;
 
@@ -17,9 +24,30 @@ class Table implements TableInterface
 
     protected $config;
 
+    private $viewData;
+
+    private $normData;
+
     public function __construct(TableConfigInterface $config)
     {
         $this->config = $config;
+        $this->children = new OrderedHashMap();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getViewData()
+    {
+        return $this->viewData;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNormData()
+    {
+        return $this->normData;
     }
 
     public function offsetExists($name)
@@ -40,6 +68,18 @@ class Table implements TableInterface
     public function offsetUnset($name)
     {
         $this->remove($name);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.0.0)<br/>
+     * Retrieve an external iterator
+     * @link http://php.net/manual/en/iteratoraggregate.getiterator.php
+     * @return Traversable An instance of an object implementing <b>Iterator</b> or
+     * <b>Traversable</b>
+     */
+    public function getIterator()
+    {
+        return $this->children;
     }
 
     /**
@@ -98,9 +138,60 @@ class Table implements TableInterface
      * @param $child
      * @return mixed
      */
-    public function add($child)
+    public function add($child, $type = null, array $options = array())
     {
-        $this->children[] = $child;
+        // Obtain the view data
+        $viewData = null;
+
+        // If setData() is currently being called, there is no need to call
+        // mapDataToForms() here, as mapDataToForms() is called at the end
+        // of setData() anyway. Not doing this check leads to an endless
+        // recursion when initializing the form lazily and an event listener
+        // (such as ResizeFormListener) adds fields depending on the data:
+        //
+        //  * setData() is called, the form is not initialized yet
+        //  * add() is called by the listener (setData() is not complete, so
+        //    the form is still not initialized)
+        //  * getViewData() is called
+        //  * setData() is called since the form is not initialized yet
+        //  * ... endless recursion ...
+        //
+        // Also skip data mapping if setData() has not been called yet.
+        // setData() will be called upon form initialization and data mapping
+        // will take place by then.
+//        if (!$this->lockSetData && $this->defaultDataSet && !$this->config->getInheritData()) {
+//            $viewData = $this->getViewData();
+//        }
+
+        if (!$child instanceof TableInterface) {
+            if (!is_string($child) && !is_int($child)) {
+                throw new UnexpectedTypeException($child, 'string, integer or Swoopaholic\Component\Table\TableInterface');
+            }
+
+            if (null !== $type && !is_string($type) && !$type instanceof TableTypeInterface) {
+                throw new UnexpectedTypeException($type, 'string or Swoopaholic\Component\Table\TableTypeInterface');
+            }
+
+            // Never initialize child forms automatically
+//            $options['auto_initialize'] = false;
+
+            if (null === $type) {
+                $child = $this->config->getTableFactory()->createForProperty($this->config->getDataClass(), $child, null, $options);
+            } else {
+                $child = $this->config->getTableFactory()->createNamed($child, $type, null, $options);
+            }
+        }
+
+        $this->children[$child->getName()] = $child;
+
+        $child->setParent($this);
+
+//        if (!$this->lockSetData && $this->defaultDataSet && !$this->config->getInheritData()) {
+//            $iterator = new InheritDataAwareIterator(new \ArrayIterator(array($child)));
+//            $iterator = new \RecursiveIteratorIterator($iterator);
+//            $this->config->getDataMapper()->mapDataToForms($viewData, $iterator);
+//        }
+
         return $this;
     }
 
@@ -202,19 +293,77 @@ class Table implements TableInterface
         // TODO: Implement isDisabled() method.
     }
 
-    public function createView(TableView $parent = null)
+    /**
+     * {@inheritdoc}
+     */
+    public function setData($modelData)
     {
-        $options = $this->getConfig()->getOptions();
-
-        $view = $this->newView($parent);
-        $this->config->getType()->buildView($view, $this, $options);
-
-        foreach ($this->children as $name => $child) {
-            /* @var NavigationInterface $child */
-            $view->children[$name] = $child->createView($view);
+        // Treat data as strings unless a value transformer exists
+        if (!$this->config->getViewTransformers() && is_scalar($modelData)) {
+            $modelData = (string) $modelData;
         }
 
-        return $view;
+        $viewData = $this->normToView($modelData);
+
+        $this->normData = $modelData;
+        $this->viewData = $viewData;
+        return $this;
+    }
+
+    public function initialize()
+    {
+        if (null !== $this->parent) {
+            throw new RuntimeException('Only root tables should be initialized.');
+        }
+
+        $this->setData($this->config->getData());
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getData()
+    {
+        $this->setData($this->config->getData());
+
+        return $this->modelData;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPropertyPath()
+    {
+        if (null !== $this->config->getPropertyPath()) {
+            return $this->config->getPropertyPath();
+        }
+
+        if (null === $this->getName() || '' === $this->getName()) {
+            return;
+        }
+
+        $parent = $this->parent;
+
+        while ($parent && $parent->getConfig()->getInheritData()) {
+            $parent = $parent->getParent();
+        }
+
+        if ($parent && null === $parent->getConfig()->getDataClass()) {
+            return new PropertyPath('['.$this->getName().']');
+        }
+
+        return new PropertyPath($this->getName());
+    }
+
+    public function createView(TableView $parent = null)
+    {
+        if (null === $parent && $this->parent) {
+            $parent = $this->parent->createView();
+        }
+
+        return $this->config->getType()->createView($this, $parent);
     }
 
     protected function newView(TableView $parent = null)
@@ -228,5 +377,30 @@ class Table implements TableInterface
     public function getConfig()
     {
         return $this->config;
+    }
+
+    /**
+     * Transforms the value if a value transformer is set.
+     *
+     * @param mixed $value The value to transform
+     *
+     * @return mixed
+     */
+    private function normToView($value)
+    {
+        // Scalar values should  be converted to strings to
+        // facilitate differentiation between empty ("") and zero (0).
+        // Only do this for simple forms, as the resulting value in
+        // compound forms is passed to the data mapper and thus should
+        // not be converted to a string before.
+        if (!$this->config->getViewTransformers()) {
+            return null === $value || is_scalar($value) ? (string) $value : $value;
+        }
+
+        foreach ($this->config->getViewTransformers() as $transformer) {
+            $value = $transformer->transform($value);
+        }
+
+        return $value;
     }
 }

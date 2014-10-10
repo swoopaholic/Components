@@ -1,42 +1,47 @@
 <?php
 /*
- * This file is part of the Swoopaholic Component package.
+ * This file is part of the Swoopaholic Framework Bundle.
  *
  * (c) Danny Dörfel <danny@swoopaholic.nl>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Swoopaholic\Component\Table\Type;
+namespace Swoopaholic\Component\Table\Extension\Crud\Type;
 
+use Swoopaholic\Component\Table\Extension\Core\Type\BaseType;
 use Swoopaholic\Component\Table\TableInterface;
 use Swoopaholic\Component\Table\TableView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class RowType extends BaseType
+class ActionType extends BaseType
 {
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         parent::setDefaultOptions($resolver);
 
-        $resolver->setDefaults(array('state' => null));
-        $resolver->setAllowedValues(array('state' => array('active', 'success', 'warning', 'danger')));
+        $resolver->setDefaults(
+            array(
+                'icon' => null,
+                'url' => null,
+                'label' => null
+            )
+        );
+        $resolver->setAllowedValues(array());
+        $resolver->setAllowedTypes(array());
     }
 
     public function buildView(TableView $view, TableInterface $table, array $options)
     {
         parent::buildView($view, $table, $options);
 
-        $view->vars['attr'] = array();
-
-        if ($options['state']) {
-            $view->vars['attr']['class'] = $options['state'];
-        }
+        $view->vars['icon'] = $options['icon'];
+        $view->vars['url'] = $options['url'];
+        $view->vars['label'] = $options['label'];
     }
-
 
     public function getName()
     {
-        return 'row';
+        return 'crud_action';
     }
 }

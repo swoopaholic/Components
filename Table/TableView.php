@@ -28,9 +28,58 @@ class TableView implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public $children = array();
 
+    /**
+     * Is the table attached to this renderer rendered?
+     *
+     * Rendering happens when either the widget or the row method was called.
+     * Row implicitly includes widget, however certain rendering mechanisms
+     * have to skip widget rendering when a row is rendered.
+     *
+     * @var bool
+     */
+    private $rendered = false;
+
     public function __construct(TableView $parent = null)
     {
         $this->parent = $parent;
+    }
+
+    /**
+     * Returns whether the view was already rendered.
+     *
+     * @return bool    Whether this view's widget is rendered.
+     */
+    public function isRendered()
+    {
+        $hasChildren = 0 < count($this->children);
+
+        if (true === $this->rendered || !$hasChildren) {
+            return $this->rendered;
+        }
+
+        if ($hasChildren) {
+            foreach ($this->children as $child) {
+                if (!$child->isRendered()) {
+                    return false;
+                }
+            }
+
+            return $this->rendered = true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Marks the view as rendered.
+     *
+     * @return TableView The view object.
+     */
+    public function setRendered()
+    {
+        $this->rendered = true;
+
+        return $this;
     }
 
     /**

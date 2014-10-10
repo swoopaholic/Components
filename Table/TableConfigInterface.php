@@ -19,7 +19,9 @@ interface TableConfigInterface
 
     public function getType();
 
-    public function setType(TableTypeInterface $type);
+    public function setType(ResolvedTableTypeInterface $type);
+
+    public function setData($data);
 
     public function isDisabled();
 
@@ -36,4 +38,10 @@ interface TableConfigInterface
     public function hasOption($name);
 
     public function getOption($name, $default = null);
+
+    public function addViewTransformer(DataTransformerInterface $transformer);
+
+    public function getViewTransformers();
+
+    public function setViewTransformers($viewTransformers);
 }
