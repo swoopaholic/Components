@@ -1,0 +1,114 @@
+{% block table_attributes %}
+    {% for attrname, attrvalue in attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}
+{% endblock %}
+
+{% block crud_action_group_widget %}
+    <div class="options">
+        <a href="#" class="icon-options options-trigger"></a>
+        <ul class="options-flyout">
+            {{ block('table_children') }}
+        </ul>
+    </div>
+{% endblock %}
+
+{% block crud_action_widget %}
+    {% set attr = table.vars.attr %}
+    <li>
+    <a href="{{ table.vars.url }}"{{ block('table_attributes') }}><span class="glyphicon glyphicon-{{ table.vars.icon }}">{% if table.vars.label %} {{ table.vars.label }}{% endif %}</span></a>
+    </li>
+{% endblock %}
+
+{% block crud_cell_widget %}
+    {% set tag = 'td' %}
+    {{ block('table_widget_compound') }}
+{% endblock %}
+
+{% block head_cell_widget %}
+    <th>
+        {% if table.vars.sortLink|length %}
+            <a href="{{ table.vars.sortLink }}">
+                {{ table.vars.label }}
+                {% if table.vars.active %}
+                    {% set sortType = table.vars.sortDir == 'DESC' ? '-by-alphabet' : '-by-alphabet-alt' %}
+                    <span class="glyphicon glyphicon-sort{{ sortType }}"></span>
+                {% endif %}
+            </a>
+        {% else %}
+            {{ table.vars.label }}
+        {% endif %}
+    </th>
+{% endblock %}
+
+{% block cell_widget %}
+    {% set tag = 'td' %}
+    <{{ tag }}>{{ table.vars.value }}</{{ tag }}>
+    {#{{ block('table_widget_simple') }}#}
+{% endblock %}
+
+{% block row_widget %}
+    {% set tag = 'tr' %}
+    {{ block('table_widget_compound') }}
+{% endblock %}
+
+{% block head_widget %}
+    {% set tag = 'thead' %}
+    {{ block('table_widget_compound') }}
+{% endblock %}
+
+{% block body_widget %}
+    {% set tag = 'tbody' %}
+    {{ block('table_widget_compound') }}
+{% endblock %}
+
+{% block table_widget_compound %}
+{% spaceless %}
+    {% set attr = table.vars.attr %}
+    <{{ tag }}{{ block('table_attributes') }}>{{ block('table_children') }}</{{ tag }}>
+{% endspaceless %}
+{% endblock %}
+
+{% block table_widget_simple %}
+{% spaceless %}
+    {% set attr = table.vars.attr %}
+    <{{ tag }}{{ block('table_attributes') }}>{{ table.vars.value }}</{{ tag }}>
+{% endspaceless %}
+{% endblock %}
+
+{% block table_widget %}
+{% spaceless %}
+    {% set tag = 'table' %}
+        {{ block('table_widget_compound') }}
+    {% endspaceless %}
+{% endblock table_widget %}
+
+{% block table_children %}
+{% spaceless %}
+    {% for child in table %}
+        {{ table_widget(child) }}
+    {% endfor %}
+{% endspaceless %}
+{% endblock %}
+
+{% block table %}
+{% spaceless %}
+    {{ table_start(table) }}
+    {{ table_widget(table) }}
+    {{ table_end(table) }}
+{% endspaceless %}
+{% endblock table %}
+
+{% block table_start %}
+{% spaceless %}
+{% if table.vars.responsive %}
+<div class="table-responsive">
+{% endif %}
+{% endspaceless %}
+{% endblock %}
+
+{% block table_end %}
+{% spaceless %}
+{% if table.vars.responsive %}
+</div>
+{% endif %}
+{% endspaceless %}
+{% endblock %}

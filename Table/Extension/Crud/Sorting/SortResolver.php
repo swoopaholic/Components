@@ -9,6 +9,7 @@
  */
 namespace Swoopaholic\Component\Table\Extension\Crud\Sorting;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -52,6 +53,11 @@ class SortResolver implements SortResolverInterface
         $this->sortParamName = 'sort';
         $this->sortOrderParamName = 'dir';
         $this->defaultSortOrder = 'ASC';
+    }
+
+    public function setRequest(Request $request)
+    {
+        $this->request = $request;
     }
 
     /**

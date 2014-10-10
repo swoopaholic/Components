@@ -15,12 +15,19 @@ class TableType extends Base
 
     protected $router;
 
-    public function __construct(SortResolverInterface $sortResolver, RouterInterface $router)
+    public function setSortResolver(SortResolverInterface $sortResolver)
     {
         $this->sortResolver = $sortResolver;
-        $this->router = $router;
+    }
 
-        parent::__construct();
+    /**
+     * @param RouterInterface $router
+     * @return $this
+     */
+    public function setRouter(RouterInterface $router)
+    {
+        $this->router = $router;
+        return $this;
     }
 
     public function setDefaultOptions(OptionsResolverInterface $resolver)
