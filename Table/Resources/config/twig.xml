@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="twig.extension.table.class">Swoopaholic\Component\Table\Twig\TableExtension</parameter>
+        <parameter key="twig.table.engine.class">Swoopaholic\Component\Table\Twig\TwigRendererEngine</parameter>
+        <parameter key="twig.table.renderer.class">Swoopaholic\Component\Table\Twig\TwigRenderer</parameter>
+    </parameters>
+
+    <services>
+
+        <service id="twig.extension.table" class="%twig.extension.table.class%" public="false">
+            <argument type="service" id="twig.table.renderer"/>
+            <tag name="twig.extension"/>
+        </service>
+
+        <service id="twig.table.engine" class="%twig.table.engine.class%" public="false">
+            <!--<argument>%twig.table.resources%</argument>-->
+            <argument type="collection">
+                <argument>table_layout.html.twig</argument>
+            </argument>
+        </service>
+
+        <service id="twig.table.renderer" class="%twig.table.renderer.class%" public="false">
+            <argument type="service" id="twig.table.engine"/>
+        </service>
+
+
+        <service id="table.type_extension.crud" class="Swoopaholic\Component\Table\Extension\Crud\CrudExtension" scope="request">
+            <tag name="table.type_extension" alias="table" />
+            <argument type="service" id="request" />
+            <argument type="service" id="router" />
+        </service>
+
+    </services>
+</container>

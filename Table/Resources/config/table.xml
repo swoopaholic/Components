@@ -1,0 +1,120 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="table.resolved_type_factory.class">Swoopaholic\Component\Table\ResolvedTableTypeFactory</parameter>
+        <parameter key="table.registry.class">Swoopaholic\Component\Table\TableRegistry</parameter>
+        <parameter key="table.extension.class">Swoopaholic\Component\Table\Extension\DependencyInjection\DependencyInjectionExtension</parameter>
+        <parameter key="table.factory.class">Swoopaholic\Component\Table\TableFactory</parameter>
+        <parameter key="table.sort_resolver.class">Swoopaholic\Component\Table\Extension\Crud\Sorting\SortResolver</parameter>
+    </parameters>
+
+    <services>
+
+        <!-- ResolvedFormTypeFactory -->
+        <service id="table.resolved_type_factory" class="%table.resolved_type_factory.class%" />
+
+        <!-- TableRegistry -->
+        <service id="table.registry" class="%table.registry.class%">
+            <argument type="collection">
+                <!--
+                We don't need to be able to add more extensions.
+                 * more types can be registered with the table.type tag
+                 * more type extensions can be registered with the table.type_extension tag
+                 * more type_guessers can be registered with the table.type_guesser tag
+                -->
+                <argument type="service" id="table.extension" />
+            </argument>
+            <argument type="service" id="table.resolved_type_factory" />
+        </service>
+
+        <!-- FormFactory -->
+        <service id="table.factory" class="%table.factory.class%">
+            <argument type="service" id="table.registry" />
+            <argument type="service" id="table.resolved_type_factory" />
+        </service>
+
+        <!-- DependencyInjectionExtension -->
+        <service id="table.extension" class="%table.extension.class%" public="false">
+            <argument type="service" id="service_container" />
+            <!-- All services with tag "form.type" are inserted here by FormPass -->
+            <argument type="collection" />
+            <!-- All services with tag "form.type_extension" are inserted here by FormPass -->
+            <argument type="collection" />
+            <!-- All services with tag "form.type_guesser" are inserted here by FormPass -->
+            <!--<argument type="collection" />-->
+        </service>
+
+        <!-- CoreExtension -->
+        <service id="table.type.table" class="Swoopaholic\Component\Table\Extension\Core\Type\TableType">
+            <argument type="service" id="property_accessor"/>
+            <tag name="table.type" alias="table" />
+        </service>
+
+        <service id="table.type.head" class="Swoopaholic\Component\Table\Extension\Core\Type\HeadType">
+            <argument type="service" id="property_accessor"/>
+            <tag name="table.type" alias="head" />
+        </service>
+
+        <service id="table.type.body" class="Swoopaholic\Component\Table\Extension\Core\Type\BodyType">
+            <argument type="service" id="property_accessor"/>
+            <tag name="table.type" alias="body" />
+        </service>
+
+        <service id="table.type.row" class="Swoopaholic\Component\Table\Extension\Core\Type\RowType">
+            <argument type="service" id="property_accessor"/>
+            <tag name="table.type" alias="row" />
+        </service>
+
+        <service id="table.type.cell" class="Swoopaholic\Component\Table\Extension\Core\Type\CellType">
+            <argument type="service" id="property_accessor"/>
+            <tag name="table.type" alias="cell" />
+        </service>
+
+        <service id="table.type.head_cell" class="Swoopaholic\Component\Table\Extension\Core\Type\HeadCellType">
+            <argument type="service" id="property_accessor"/>
+            <tag name="table.type" alias="head_cell" />
+        </service>
+
+        <!-- CrudExtension -->
+        <service id="table.sort_resolver" class="%table.sort_resolver.class%" public="false">
+            <argument type="service" id="request" strict="false" />
+        </service>
+
+        <service id="table.type.crud_table" class="Swoopaholic\Component\Table\Extension\Crud\Type\TableType">
+            <argument type="service" id="property_accessor"/>
+            <call method="setSortResolver"><argument type="service" id="table.sort_resolver"/></call>
+            <call method="setRouter"><argument type="service" id="router"/></call>
+            <tag name="table.type" alias="crud_table" />
+        </service>
+
+        <service id="table.type.text" class="Swoopaholic\Component\Table\Extension\Crud\Type\TextType">
+            <argument type="service" id="property_accessor"/>
+            <tag name="table.type" alias="text" />
+        </service>
+
+        <service id="table.type.datetime" class="Swoopaholic\Component\Table\Extension\Crud\Type\DateTimeType">
+            <argument type="service" id="property_accessor"/>
+            <tag name="table.type" alias="datetime" />
+        </service>
+
+        <service id="crud_table.type.crud_cell" class="Swoopaholic\Component\Table\Extension\Crud\Type\CrudCellType">
+            <argument type="service" id="property_accessor"/>
+            <tag name="table.type" alias="crud_cell" />
+        </service>
+
+        <service id="crud_table.type.crud_action_group" class="Swoopaholic\Component\Table\Extension\Crud\Type\ActionGroupType">
+            <argument type="service" id="property_accessor"/>
+            <tag name="table.type" alias="crud_action_group" />
+        </service>
+
+        <service id="table.type.crud_action" class="Swoopaholic\Component\Table\Extension\Crud\Type\ActionType">
+            <argument type="service" id="property_accessor"/>
+            <tag name="table.type" alias="crud_action" />
+        </service>
+
+    </services>
+</container>
