@@ -33,10 +33,15 @@ class TableType extends Base
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         parent::setDefaultOptions($resolver);
-        $resolver->setRequired(array('table_route', 'data'));
-
-        $resolver->addAllowedTypes(array(
-            'data' => array('array', 'Iterator')
+        $resolver->setDefaults(array(
+            'use_thead' => false,
+            'use_tbody' => false,
+        ))->setRequired(array(
+            'table_route', 'data'
+        ))->addAllowedTypes(array(
+            'data'  => array('array', 'Iterator'),
+            'use_tbody' => 'bool',
+            'use_thead' => 'bool',
         ));
     }
 
@@ -58,11 +63,16 @@ class TableType extends Base
 
     protected function buildTableHeader(TableBuilderInterface $builder, $options)
     {
-        $head = $builder->create('thead', 'head', array());
-        $builder->add($head);
-
         $headRow = $builder->create('row', 'row', array());
-        $head->add($headRow);
+
+        if ($options['use_thead']) {
+            $wrapper = $builder->create('thead', 'head', array());
+            $builder->add($wrapper);
+            $wrapper->add($headRow);
+        } else {
+            $builder->add($headRow);
+            $wrapper = $headRow;
+        }
 
         foreach ($this->columns as $name => $info) {
             $label = isset($info['options']['label']) ? $info['options']['label'] : $name;
@@ -77,18 +87,22 @@ class TableType extends Base
             }
 
             $cell = $builder->create($name, 'head_cell', $params);
-            $headRow->add($cell);
+            $wrapper->add($cell);
         }
 
         // for crud actions
         $cell = $builder->create('actions', 'head_cell');
-        $headRow->add($cell);
+        $wrapper->add($cell);
     }
 
     protected function buildTableBody(TableBuilderInterface $builder, $options)
     {
-        $body = $builder->create('tbody', 'body', array());
-        $builder->add($body);
+        if ($options['use_tbody']) {
+            $container = $builder->create('tbody', 'body', array());
+            $builder->add($container);
+        } else {
+            $container = $builder;
+        }
 
         $count = (string) is_array($options['data']) ? count($options['data']) : $options['data']->count();
         $padCount = strlen($count);
@@ -110,7 +124,7 @@ class TableType extends Base
 
             $this->buildRowActions($builder, $cell, $item, $options);
 
-            $body->add($row);
+            $container->add($row);
         }
     }
 
