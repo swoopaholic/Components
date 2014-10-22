@@ -36,12 +36,14 @@ class TableType extends Base
         $resolver->setDefaults(array(
             'use_thead' => false,
             'use_tbody' => false,
+            'extra_url_params' => array(),
         ))->setRequired(array(
             'table_route', 'data'
         ))->addAllowedTypes(array(
             'data'  => array('array', 'Iterator'),
             'use_tbody' => 'bool',
             'use_thead' => 'bool',
+            'extra_url_params' => array('array'),
         ));
     }
 
@@ -79,7 +81,7 @@ class TableType extends Base
             $params = array('label' => $label);
 
             if (isset($info['options']['sort'])) {
-                $sortParams = $this->sortResolver->getSortParams($info['options']['sort']);
+                $sortParams = $this->sortResolver->getSortParams($info['options']['sort'], $options['extra_url_params']);
                 $sortLink = $options['table_route'];
                 $params['sortLink'] = $this->router->generate($sortLink, $sortParams);
                 $params['sortDir'] = $this->sortResolver->getSortDir($info['options']['sort']);

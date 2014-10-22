@@ -15,9 +15,10 @@ interface SortResolverInterface
      * Returns the uri query params for the sort key
      *
      * @param $key
+     * @param array $extraUrlParams
      * @return array
      */
-    public function getSortParams($key);
+    public function getSortParams($key, $extraUrlParams = array());
 
     /**
      * Returns the current sort direction for the key

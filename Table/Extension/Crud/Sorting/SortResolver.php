@@ -91,15 +91,15 @@ class SortResolver implements SortResolverInterface
     }
 
     /**
-     * @param $key
-     * @return string
+     * @inheritdoc
      */
-    public function getSortParams($key)
+    public function getSortParams($key, $extraUrlParams = array())
     {
-        return array(
+        $params = array(
             $this->sortParamName => $key,
             $this->sortOrderParamName => $this->getSortDir($key)
         );
+        return array_merge($params, $extraUrlParams);
     }
 
     /**
