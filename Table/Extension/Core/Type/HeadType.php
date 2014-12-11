@@ -9,8 +9,18 @@
  */
 namespace Swoopaholic\Component\Table\Extension\Core\Type;
 
+use Swoopaholic\Component\Table\TableInterface;
+use Swoopaholic\Component\Table\TableView;
+
 class HeadType extends BaseType
 {
+    public function buildView(TableView $view, TableInterface $table, array $options)
+    {
+        parent::buildView($view, $table, $options);
+
+        $view->vars['attr'] = array();
+    }
+
     public function getName()
     {
         return 'head';

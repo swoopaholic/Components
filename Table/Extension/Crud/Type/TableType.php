@@ -66,16 +66,15 @@ class TableType extends Base
     protected function buildTableHeader(TableBuilderInterface $builder, $options)
     {
         $headRow = $builder->create('row', 'row', array());
-
         if ($options['use_thead']) {
             $wrapper = $builder->create('thead', 'head', array());
             $builder->add($wrapper);
             $wrapper->add($headRow);
         } else {
             $builder->add($headRow);
-            $wrapper = $headRow;
         }
 
+        $wrapper = $headRow;
         foreach ($this->columns as $name => $info) {
             $label = isset($info['options']['label']) ? $info['options']['label'] : $name;
             $params = array('label' => $label);
