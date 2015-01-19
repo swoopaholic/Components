@@ -1,6 +1,7 @@
 <?php
 namespace Swoopaholic\Component\Table\Extension\Crud\Type;
 
+use Swoopaholic\Component\Table\DataTransformerInterface;
 use Swoopaholic\Component\Table\Extension\Core\Type\TableType as Base;
 use Swoopaholic\Component\Table\Extension\Crud\Sorting\SortResolverInterface;
 use Swoopaholic\Component\Table\TableBuilderInterface;
@@ -114,7 +115,14 @@ class TableType extends Base
             $row = $builder->create('row' . $rowNumber, 'row', array());
 
             foreach ($this->columns as $name => $info) {
-                $value = $this->getValue($item, $name);
+                if (isset($info['options']['data_transformer']) &&
+                    $info['options']['data_transformer'] instanceof DataTransformerInterface) {
+                    $transformer = $info['options']['data_transformer'];
+                    $value = $transformer->transform($item);
+                } else {
+                    $value = $this->getValue($item, $name);
+                }
+
                 $type = $info['type'];
                 $cell = $builder->create($name, $type, array('data' => $value));
                 $row->add($cell);
