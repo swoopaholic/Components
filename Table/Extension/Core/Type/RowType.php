@@ -20,7 +20,7 @@ class RowType extends BaseType
         parent::setDefaultOptions($resolver);
 
         $resolver->setDefaults(array('state' => null));
-        $resolver->setAllowedValues(array('state' => array('active', 'success', 'warning', 'danger')));
+        $resolver->setAllowedValues(array('state' => array(null, 'active', 'success', 'warning', 'danger')));
     }
 
     public function buildView(TableView $view, TableInterface $table, array $options)
