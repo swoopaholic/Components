@@ -16,10 +16,5 @@
         "psr-0": { "Swoopaholic\\Component\\": "" }
     },
     "target-dir": "Swoopaholic/Component",
-    "minimum-stability": "dev",
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.0-dev"
-        }
-    }
+    "minimum-stability": "stable"
 }
