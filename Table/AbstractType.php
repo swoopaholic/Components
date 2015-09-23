@@ -9,7 +9,7 @@
  */
 namespace Swoopaholic\Component\Table;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class AbstractType
@@ -41,7 +41,7 @@ abstract class AbstractType implements TableTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
     }
 

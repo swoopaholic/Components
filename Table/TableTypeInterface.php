@@ -9,7 +9,7 @@
  */
 namespace Swoopaholic\Component\Table;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 interface TableTypeInterface
 {
@@ -32,8 +32,8 @@ interface TableTypeInterface
     public function getName();
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      * @return mixed
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver);
+    public function setDefaultOptions(OptionsResolver $resolver);
 }
