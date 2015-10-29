@@ -5,7 +5,7 @@ use Swoopaholic\Component\Table\DataTransformerInterface;
 use Swoopaholic\Component\Table\Extension\Core\Type\TableType as Base;
 use Swoopaholic\Component\Table\Extension\Crud\Sorting\SortResolverInterface;
 use Swoopaholic\Component\Table\TableBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 
 class TableType extends Base
@@ -31,7 +31,7 @@ class TableType extends Base
         return $this;
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
         parent::setDefaultOptions($resolver);
         $resolver->setDefaults(array(

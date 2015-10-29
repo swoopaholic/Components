@@ -12,7 +12,7 @@ namespace Swoopaholic\Component\Table\Extension\Core\Type;
 use Swoopaholic\Component\Table\AbstractType;
 use Swoopaholic\Component\Table\TableInterface;
 use Swoopaholic\Component\Table\TableView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 abstract class BaseType extends AbstractType
 {
@@ -67,7 +67,7 @@ abstract class BaseType extends AbstractType
         ));
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
             'data'               => null,

@@ -11,11 +11,11 @@ namespace Swoopaholic\Component\Table\Extension\Core\Type;
 
 use Swoopaholic\Component\Table\TableInterface;
 use Swoopaholic\Component\Table\TableView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RowType extends BaseType
 {
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
         parent::setDefaultOptions($resolver);
 

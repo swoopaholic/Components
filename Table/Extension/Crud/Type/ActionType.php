@@ -12,11 +12,11 @@ namespace Swoopaholic\Component\Table\Extension\Crud\Type;
 use Swoopaholic\Component\Table\Extension\Core\Type\BaseType;
 use Swoopaholic\Component\Table\TableInterface;
 use Swoopaholic\Component\Table\TableView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ActionType extends BaseType
 {
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
         parent::setDefaultOptions($resolver);
 

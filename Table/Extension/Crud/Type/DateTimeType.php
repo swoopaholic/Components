@@ -12,11 +12,11 @@ namespace Swoopaholic\Component\Table\Extension\Crud\Type;
 use Swoopaholic\Component\Table\AbstractType;
 use Swoopaholic\Component\Table\Extension\Crud\DataTransformer\DateTimeTransformer;
 use Swoopaholic\Component\Table\TableBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DateTimeType extends AbstractType
 {
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
         parent::setDefaultOptions($resolver);
         $resolver->setAllowedTypes(array('data' => array('DateTime', 'null')));
